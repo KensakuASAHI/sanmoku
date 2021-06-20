@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>3目並べ</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        table td {
+            border: solid 1px black;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>3目並べ</h1>
+    <h2 id="message"></h2>
+    <table id="table">
+    </table>
+    <script>
+        const SX = 3, SY = 3
+        let table = new Array(SY)
+        const trun_mark = ["○", "×", ""]
+        let turn = 0;
+        function setTurnMark(trun) {
+            document.getElementById('message').innerText = "現在のターン：" + trun_mark[turn]
+        }
+        function checkAndSetMark(element) {
+            const xy = element.id.substr(1).split("x")
+            const x = Number(xy[1])
+            const y = Number(xy[0])
+            /*
+            console.log("id:"+this.id)
+            console.log("t:"+turn)
+            console.log("y:"+y)
+            console.log("x:"+x)
+            console.log("table:"+table[y][x])
+            */
+            if (table[y][x] == 2) {
+                table[y][x] = turn
+                element.innerText = trun_mark[turn]
+                turn++
+                turn = turn % 2
+                setTurnMark(turn)
+            }
+        }
+        function checkEnd() {
+            let c = []
+            let i, j
+            let c2 = 0
+            for (j = 0; j < SY; j++) {
+                c[0] = c[1] = c[2] = 0
+                for (i = 0; i < SX; i++) {
+                    c[table[j][i]]++
+                }
+                if (c[2] == 0) {
+                    if (c[0] == SX)
+                        return 0
+                    if (c[1] == SX)
+                        return 1
+                }
+                if(c[2] == 0)
+                    c2++
+            }
+            if(c2 == SY)
+                return 3
+            for (i = 0; i < SX; i++) {
+                c[0] = c[1] = c[2] = 0
+                for (j = 0; j < SY; j++) {
+                    c[table[j][i]]++
+                }
+                if (c[2] == 0) {
+                    if (c[0] == SY)
+                        return 0
+                    if (c[1] == SY)
+                        return 1
+                }
+            }
+            c[0] = c[1] = c[2] = 0
+            for (i = 0; i < SX; i++) {
+                c[table[i][i]]++
+            }
+            if (c[2] == 0) {
+                if (c[0] == SX)
+                    return 0
+                if (c[1] == SX)
+                    return 1
+            }
+            return 2
+        }
+        window.onload = function () {
+            setTurnMark(turn)
+            let t = document.getElementById('table')
+            for (let j = 0; j < SY; j++) {
+                let tr = t.appendChild(document.createElement("tr"))
+                table[j] = new Array(SX)
+                for (let i = 0; i < SX; i++) {
+                    let td = document.createElement("td")
+                    td.innerText = "　"
+                    td.id = "y" + j + "x" + i
+                    td.addEventListener('click', function () {
+                        if (turn != 2) {
+                            checkAndSetMark(this)
+                            let r = checkEnd()
+                            if (r == 0 || r == 1) {
+                                document.getElementById('message').innerHTML = "ゲーム終了!! " + trun_mark[r] + "の勝利.(再度開始するためには再読み込みして下さい)"
+                                turn = 2
+                            }
+                            if(r == 3) {
+                                document.getElementById('message').innerHTML = "ゲーム終了!! 引き分け.(再度開始するためには再読み込みして下さい)"
+                                turn = 2
+                            }
+                        }
+                    }, false)
+                    tr.appendChild(td)
+                    table[j][i] = 2;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
